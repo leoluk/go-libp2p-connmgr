@@ -97,7 +97,17 @@ func (s *segment) tagInfoFor(p peer.ID) *peerInfo {
 // * grace is the amount of time a newly opened connection is given before it becomes
 //   subject to pruning.
 func NewConnManager(low, hi int, grace time.Duration, opts ...Option) *BasicConnMgr {
-	ctx, cancel := context.WithCancel(context.Background())
+	return newConnMgr(context.Background(), low, hi, grace, opts)
+}
+
+// NewConnManagerWithContext creates a new BasicConnMgr with the given context.
+// See NewConnManager.
+func NewConnManagerWithContext(ctx context.Context, low, hi int, grace time.Duration, opts ...Option) *BasicConnMgr {
+	return newConnMgr(ctx, low, hi, grace, opts)
+}
+
+func newConnMgr(ctx context.Context, low int, hi int, grace time.Duration, opts []Option) *BasicConnMgr {
+	ctx, cancel := context.WithCancel(ctx)
 
 	cfg := &BasicConnManagerConfig{
 		highWater:     hi,
